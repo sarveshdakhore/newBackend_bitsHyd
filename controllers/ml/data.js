@@ -61,7 +61,7 @@ export const updateUserAttributes = async (req, res) => {
             return res.status(200).json({ 
                 message: "User profile updated with new attributes.", 
                 updated: true,
-                attributes: results 
+                attributes: results
             });
         }
         

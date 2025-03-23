@@ -1,31 +1,28 @@
-// This is your Prisma schema file
-// Learn more about it at https://pris.ly/d/prisma-schema
-
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DB_URL")
-  extensions = [pgvector(map: "vector", schema: "extensions")]
+  provider   = "postgresql"
+  url        = env("DB_URL")
+  extensions = [uuid_ossp(map: "uuid-ossp", schema: "extensions"), vector(schema: "extensions")]
 }
 
 model User {
-  id             Int           @id @default(autoincrement())
-  email          String        @unique
-  name           String?
-  verified       Boolean       @default(false)
-  password       Password?
-  otp            Otp[]
-  token_v        Int           @default(0)
-  additional_info Json?        @db.JsonB
-  roleId         Int?
-  role           Role?         @relation(fields: [roleId], references: [id])
+  id              Int              @id @default(autoincrement())
+  email           String           @unique
+  name            String?
+  verified        Boolean          @default(false)
+  token_v         Int              @default(0)
+  additional_info Json?
+  roleId          Int?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  otp             Otp[]
+  password        Password?
   formSubmissions FormSubmission[]
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  role            Role?            @relation(fields: [roleId], references: [id])
 
   @@map("users")
 }
@@ -38,91 +35,91 @@ model Password {
 }
 
 model Otp {
-  id         Int      @id @default(autoincrement())
-  userId     Int
-  otp        String
-  expiresAt  DateTime
-  type       String   @default("login")
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  salt       String
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  otp       String
+  expiresAt DateTime
+  type      String   @default("login")
+  salt      String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Role {
   id          Int      @id @default(autoincrement())
   name        String   @unique
   description String?
-  users       User[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  users       User[]
 
   @@map("roles")
 }
 
 model FormField {
-  id          Int       @id @default(autoincrement())
-  label       String    @unique
+  id          Int               @id @default(autoincrement())
+  label       String            @unique
   description String?
-  fieldType   FieldType @default(TEXT)
-  isRequired  Boolean   @default(false)
-  validations Json?     @db.JsonB
+  fieldType   FieldType         @default(TEXT)
+  isRequired  Boolean           @default(false)
+  validations Json?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
   forms       FormFieldOnForm[]
   formValues  FormValue[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
 
   @@map("formfields")
 }
 
 model Form {
-  id          Int       @id @default(autoincrement())
+  id          Int                   @id @default(autoincrement())
   title       String
   description String?
+  embeddings  Unsupported("vector")
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
   fields      FormFieldOnForm[]
   submissions FormSubmission[]
-  embeddings  Unsupported("vector(1024)")
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
 
   @@map("forms")
 }
 
 model FormFieldOnForm {
-  id          Int       @id @default(autoincrement())
-  formId      Int
-  fieldId     Int
-  order       Int       @default(0)
-  form        Form      @relation(fields: [formId], references: [id])
-  formField   FormField @relation(fields: [fieldId], references: [id])
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id        Int       @id @default(autoincrement())
+  formId    Int
+  fieldId   Int
+  order     Int       @default(0)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  formField FormField @relation(fields: [fieldId], references: [id])
+  form      Form      @relation(fields: [formId], references: [id])
 
   @@unique([formId, fieldId])
   @@map("form_field_on_form")
 }
 
 model FormSubmission {
-  id        Int         @id @default(autoincrement())
+  id        Int              @id @default(autoincrement())
   formId    Int
   userId    Int
-  form      Form        @relation(fields: [formId], references: [id])
-  user      User        @relation(fields: [userId], references: [id])
-  values    FormValue[]
   status    SubmissionStatus @default(DRAFT)
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  form      Form             @relation(fields: [formId], references: [id])
+  user      User             @relation(fields: [userId], references: [id])
+  values    FormValue[]
 
   @@map("form_submissions")
 }
 
 model FormValue {
-  id             Int            @id @default(autoincrement())
-  submissionId   Int
-  fieldId        Int
-  value          String
-  submission     FormSubmission @relation(fields: [submissionId], references: [id])
-  field          FormField      @relation(fields: [fieldId], references: [id])
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
+  id           Int            @id @default(autoincrement())
+  submissionId Int
+  fieldId      Int
+  value        String
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  field        FormField      @relation(fields: [fieldId], references: [id])
+  submission   FormSubmission @relation(fields: [submissionId], references: [id])
 
   @@unique([submissionId, fieldId])
   @@map("form_values")

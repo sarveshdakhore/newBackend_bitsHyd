@@ -1,4 +1,4 @@
-import prisma from "../DB/dbConfig.js";
+import prisma from "../../DB/dbConfig.js";
 
 export const getUserFormMetrics = async (req, res) => {
   try {
@@ -120,60 +120,26 @@ export const getRecentFormSubmissions = async (req, res) => {
 };
 
 
-export const updateFormSubmissionStatus = async (req, res) => {
-  try {
-    const { submissionId, status } = req.body;
-    const user = req.payload.userAccount;
-
-    // Validate input
-    if (!submissionId || !status) {
-      return res.status(400).json({ message: "Submission ID and status are required." });
-    }
-
-    // Check if the user has the "Admin" role
-    const userWithRole = await prisma.user.findUnique({
-      where: { id: user.id },
-      select: {
-        role: {
-          select: {
-            name: true,
-          },
-        },
-      },
-    });
-
-    if (!userWithRole || userWithRole.role.name !== "Admin") {
-      return res.status(403).json({ message: "You do not have permission to change the status of form submissions." });
-    }
-
-    // Update the form submission status
-    const updatedSubmission = await prisma.formSubmission.update({
-      where: { id: submissionId },
-      data: { status: status },
-    });
-
-    return res.status(200).json({
-      message: "Form submission status updated successfully.",
-      submission: updatedSubmission,
-    });
-  } catch (error) {
-    console.error("Error updating form submission status:", error);
-    return res.status(500).json({ message: "Internal server error", error: error.message });
-  }
-};
-
 export const submitFormAI = async (req, res) => {
   try {
-    const { formId, userId } = req.body;
+    const { form_struct, user_id } = req.body;
+
+    // Log the input data
+    console.log("Received form_struct:", form_struct);
+    console.log("Received user_id:", user_id);
 
     // Validate input
-    if (!formId || !userId) {
-      return res.status(400).json({ message: "Form ID and User ID are required." });
+    if (!form_struct || !form_struct.formId) {
+      console.log("Validation failed: Form structure and Form ID are required.");
+      return res.status(400).json({ message: "Form structure and Form ID are required." });
     }
+
+    const userId = 1; // Set user ID to 1 permanently
+    console.log("Using userId:", userId);
 
     // Find the form
     const form = await prisma.form.findUnique({
-      where: { id: formId },
+      where: { id: form_struct.formId },
       include: {
         fields: {
           include: {
@@ -184,8 +150,11 @@ export const submitFormAI = async (req, res) => {
     });
 
     if (!form) {
+      console.log("Form not found for formId:", form_struct.formId);
       return res.status(404).json({ message: "Form not found." });
     }
+
+    console.log("Found form:", form);
 
     // Find the user
     const user = await prisma.user.findUnique({
@@ -193,8 +162,11 @@ export const submitFormAI = async (req, res) => {
     });
 
     if (!user) {
+      console.log("User not found for userId:", userId);
       return res.status(404).json({ message: "User not found." });
     }
+
+    console.log("Found user:", user);
 
     // Prepare form submission data
     const formSubmissionData = {
@@ -203,9 +175,11 @@ export const submitFormAI = async (req, res) => {
       status: "SUBMITTED",
       values: form.fields.map((field) => ({
         fieldId: field.formField.id,
-        value: req.body[field.formField.label] || "",
+        value: form_struct[field.formField.label] || "",
       })),
     };
+
+    console.log("Prepared formSubmissionData:", formSubmissionData);
 
     // Create form submission
     const formSubmission = await prisma.formSubmission.create({
@@ -219,12 +193,14 @@ export const submitFormAI = async (req, res) => {
       },
     });
 
+    console.log("Created formSubmission:", formSubmission);
+
     // Update user attributes
     let additionalInfo = user.additional_info || {};
     const results = {};
     let dataUpdated = false;
 
-    for (const [key, value] of Object.entries(req.body)) {
+    for (const [key, value] of Object.entries(form_struct)) {
       if (additionalInfo[key]) {
         results[key] = additionalInfo[key];
       } else {
@@ -234,11 +210,16 @@ export const submitFormAI = async (req, res) => {
       }
     }
 
+    console.log("Prepared additionalInfo:", additionalInfo);
+    console.log("Prepared results:", results);
+
     if (dataUpdated) {
       await prisma.user.update({
         where: { id: userId },
         data: { additional_info: additionalInfo },
       });
+
+      console.log("Updated user profile with new attributes.");
 
       return res.status(200).json({
         message: "Form submitted and user profile updated successfully.",
@@ -247,6 +228,8 @@ export const submitFormAI = async (req, res) => {
         attributes: results,
       });
     }
+
+    console.log("No new attributes were added.");
 
     return res.status(200).json({
       message: "Form submitted successfully. No new attributes were added.",

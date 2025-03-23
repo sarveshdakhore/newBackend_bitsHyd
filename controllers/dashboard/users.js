@@ -15,6 +15,12 @@ export const getUserProfile = async (req, res) => {
       select: {
         name: true,
         email: true,
+        role: {
+          select: {
+            name: true,
+            description: true,
+          },
+        },
         additional_info: true,
       },
     });
@@ -26,7 +32,8 @@ export const getUserProfile = async (req, res) => {
     const flatUserData = {
       name: user.name,
       email: user.email,
-      ...user.additional_info,
+      additional_info: user.additional_info,
+      role: user.role,
     };
 
     return res.status(200).json(flatUserData);
@@ -39,7 +46,6 @@ export const getUserProfile = async (req, res) => {
 export const getCurrentUserProfile = async (req, res) => {
   try {
     const userId = req.payload.userAccount.id;
-
     req.params = { userId: userId };
     return getUserProfile(req, res);
   } catch (error) {

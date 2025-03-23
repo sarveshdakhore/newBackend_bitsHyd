@@ -1,5 +1,5 @@
 import express from "express";
-import { getRecentFormSubmissions, getUserFormMetrics } from "../controllers/forms.js";
+import { getRecentFormSubmissions, getUserFormMetrics } from "../controllers/dashboard/forms.js";
 import { authMiddleware } from "../middleware/auth.js";
 
 const router = express.Router();

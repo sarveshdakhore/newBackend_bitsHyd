@@ -48,5 +48,5 @@ export const getCurrentUserProfile = async (req, res) => {
   }
 };
 
-//sample curl
+
 

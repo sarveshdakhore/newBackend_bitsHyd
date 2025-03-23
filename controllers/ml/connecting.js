@@ -1,6 +1,4 @@
 // frontend will send the query need to pass it to the ML model like the ajaz request and the response need to be sent back to the frontend
-
-import prisma from "../../DB/dbConfig.js";
 import dotenv from "dotenv";
 import axios from "axios";
 
@@ -16,7 +14,8 @@ export const getMLResponse = async (req, res) => {
     if (!query) {
       return res.status(400).json({ message: "Query is required." });
     }
-    const response = await axios.post(ML_URL, { query:query, userId: user.id });
+    console.log("user", user.id, "query", query);  
+    const response = await axios.post(ML_URL, { question:query, user_id: user.id });
     return res.status(200).json(response.data);
   } catch (error) {
     console.error(error);

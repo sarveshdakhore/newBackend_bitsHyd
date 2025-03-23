@@ -2,7 +2,7 @@ import prisma from "../DB/dbConfig.js";
 
 export const getUserFormMetrics = async (req, res) => {
   try {
-    const userId = 2;
+    const userId = req.payload.userAccount.id;
 
     const forms = await prisma.form.findMany({
       select: {

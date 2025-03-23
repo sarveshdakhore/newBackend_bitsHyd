@@ -120,7 +120,7 @@ async function main() {
   formFields.push(
     await prisma.formField.create({
       data: {
-        label: "Applicant Name",
+        label: "applicant_name", // Changed from "Applicant Name"
         description: "Full name of the applicant",
         fieldType: "TEXT",
         isRequired: true,
@@ -132,7 +132,7 @@ async function main() {
   formFields.push(
     await prisma.formField.create({
       data: {
-        label: "Applicant Address",
+        label: "applicant_address", // Changed from "Applicant Address"
         description: "Complete address of the applicant",
         fieldType: "TEXTAREA",
         isRequired: true,
@@ -144,7 +144,7 @@ async function main() {
   formFields.push(
     await prisma.formField.create({
       data: {
-        label: "Applicant Nationality",
+        label: "applicant_nationality", // Changed from "Applicant Nationality"
         description: "Nationality of the applicant",
         fieldType: "TEXT",
         isRequired: true,
@@ -156,7 +156,7 @@ async function main() {
   formFields.push(
     await prisma.formField.create({
       data: {
-        label: "Applicant Category",
+        label: "applicant_category", // Changed from "Applicant Category"
         description: "Category of the applicant",
         fieldType: "SELECT",
         isRequired: true,
@@ -169,7 +169,7 @@ async function main() {
   formFields.push(
     await prisma.formField.create({
       data: {
-        label: "Work Title",
+        label: "work_title", // Changed from "Work Title"
         description: "Title of the work for copyright registration",
         fieldType: "TEXT",
         isRequired: true,
@@ -181,7 +181,7 @@ async function main() {
   formFields.push(
     await prisma.formField.create({
       data: {
-        label: "Work Description",
+        label: "work_description", // Changed from "Work Description"
         description: "Description of the work",
         fieldType: "TEXTAREA",
         isRequired: true,
@@ -193,7 +193,7 @@ async function main() {
   formFields.push(
     await prisma.formField.create({
       data: {
-        label: "Work Class",
+        label: "work_class", // Changed from "Work Class"
         description: "Class of the work",
         fieldType: "SELECT",
         isRequired: true,
@@ -215,7 +215,7 @@ async function main() {
   formFields.push(
     await prisma.formField.create({
       data: {
-        label: "Work Language",
+        label: "work_language", // Changed from "Work Language"
         description: "Language of the work",
         fieldType: "TEXT",
         isRequired: true,
@@ -228,7 +228,7 @@ async function main() {
   formFields.push(
     await prisma.formField.create({
       data: {
-        label: "Author Name",
+        label: "author_name", // Changed from "Author Name"
         description: "Full name of the author",
         fieldType: "TEXT",
         isRequired: true,
@@ -240,7 +240,7 @@ async function main() {
   formFields.push(
     await prisma.formField.create({
       data: {
-        label: "Author Address",
+        label: "author_address", // Changed from "Author Address"
         description: "Address of the author",
         fieldType: "TEXTAREA",
         isRequired: true,
@@ -252,7 +252,7 @@ async function main() {
   formFields.push(
     await prisma.formField.create({
       data: {
-        label: "Publication Status",
+        label: "publication_status", // Changed from "Publication Status"
         description: "Is the work published or unpublished?",
         fieldType: "SELECT",
         isRequired: true,
@@ -264,7 +264,7 @@ async function main() {
   formFields.push(
     await prisma.formField.create({
       data: {
-        label: "Publisher Details",
+        label: "publisher_details", // Changed from "Publisher Details"
         description: "Name and address of the publisher",
         fieldType: "TEXTAREA",
         isRequired: false,
@@ -276,7 +276,7 @@ async function main() {
   formFields.push(
     await prisma.formField.create({
       data: {
-        label: "Year of First Publication",
+        label: "publication_year", // Changed from "Year of First Publication"
         description: "Year when the work was first published",
         fieldType: "NUMBER",
         isRequired: false,
@@ -288,7 +288,7 @@ async function main() {
   formFields.push(
     await prisma.formField.create({
       data: {
-        label: "Fee Payment Details",
+        label: "fee_payment_details", // Changed from "Fee Payment Details"
         description: "Details of payment of registration fee",
         fieldType: "TEXT",
         isRequired: true,
@@ -300,7 +300,7 @@ async function main() {
   formFields.push(
     await prisma.formField.create({
       data: {
-        label: "Declaration",
+        label: "declaration", // Changed from "Declaration"
         description:
           "I verify that particulars given in this form are true to the best of my knowledge",
         fieldType: "CHECKBOX",
@@ -313,7 +313,7 @@ async function main() {
   formFields.push(
     await prisma.formField.create({
       data: {
-        label: "Work Sample",
+        label: "work_sample", // Changed from "Work Sample"
         description:
           "Upload a copy of the work for which registration is sought",
         fieldType: "FILE",
@@ -614,6 +614,183 @@ async function main() {
 
   console.log("Created second form with embeddings");
 
+  // Create form fields for leave application form
+  const leaveFormFields = [];
+
+  // Applicant information fields (similar to copyright form)
+  leaveFormFields.push(
+    await prisma.formField.create({
+      data: {
+        label: "leave_applicant_name", // Changed from "Leave Applicant Name"
+        description: "Full name of the leave applicant",
+        fieldType: "TEXT",
+        isRequired: true,
+        validations: { minLength: 3, maxLength: 200 },
+      },
+    })
+  );
+
+  leaveFormFields.push(
+    await prisma.formField.create({
+      data: {
+        label: "employee_id", // Changed from "Employee ID"
+        description: "Identification number of the employee",
+        fieldType: "TEXT",
+        isRequired: true,
+        validations: { minLength: 2, maxLength: 50 },
+      },
+    })
+  );
+
+  leaveFormFields.push(
+    await prisma.formField.create({
+      data: {
+        label: "employee_department", // Changed from "Employee Department"
+        description: "Department of the applicant",
+        fieldType: "TEXT",
+        isRequired: true,
+        validations: { minLength: 2, maxLength: 100 },
+      },
+    })
+  );
+
+  // Leave details fields
+  leaveFormFields.push(
+    await prisma.formField.create({
+      data: {
+        label: "leave_type", // Changed from "Leave Type"
+        description: "Type of leave requested",
+        fieldType: "SELECT",
+        isRequired: true,
+        validations: {
+          options: [
+            "Sick Leave",
+            "Casual Leave",
+            "Vacation",
+            "Personal Leave",
+            "Study Leave",
+            "Copyright Research Leave",
+          ],
+        },
+      },
+    })
+  );
+
+  leaveFormFields.push(
+    await prisma.formField.create({
+      data: {
+        label: "leave_start_date", // Changed from "Leave Start Date"
+        description: "First day of requested leave",
+        fieldType: "DATE",
+        isRequired: true,
+        validations: {},
+      },
+    })
+  );
+
+  leaveFormFields.push(
+    await prisma.formField.create({
+      data: {
+        label: "leave_end_date", // Changed from "Leave End Date"
+        description: "Last day of requested leave",
+        fieldType: "DATE",
+        isRequired: true,
+        validations: {},
+      },
+    })
+  );
+
+  leaveFormFields.push(
+    await prisma.formField.create({
+      data: {
+        label: "leave_reason", // Changed from "Leave Reason"
+        description: "Detailed reason for requesting leave",
+        fieldType: "TEXTAREA",
+        isRequired: true,
+        validations: { minLength: 10, maxLength: 500 },
+      },
+    })
+  );
+
+  leaveFormFields.push(
+    await prisma.formField.create({
+      data: {
+        label: "ip_work_related", // Changed from "IP Work Related"
+        description:
+          "Is this leave related to work on intellectual property or copyright applications?",
+        fieldType: "SELECT",
+        isRequired: true,
+        validations: { options: ["Yes", "No"] },
+      },
+    })
+  );
+
+  leaveFormFields.push(
+    await prisma.formField.create({
+      data: {
+        label: "work_handover_info", // Changed from "Work Handover Info"
+        description: "Details of pending work and handover arrangements",
+        fieldType: "TEXTAREA",
+        isRequired: false,
+        validations: { minLength: 0, maxLength: 500 },
+      },
+    })
+  );
+
+  leaveFormFields.push(
+    await prisma.formField.create({
+      data: {
+        label: "leave_contact_info", // Changed from "Leave Contact Info"
+        description: "Contact information during leave period",
+        fieldType: "TEXT",
+        isRequired: true,
+        validations: { minLength: 5, maxLength: 100 },
+      },
+    })
+  );
+
+  leaveFormFields.push(
+    await prisma.formField.create({
+      data: {
+        label: "leave_supporting_docs", // Changed from "Leave Supporting Docs"
+        description: "Upload any relevant supporting documents",
+        fieldType: "FILE",
+        isRequired: false,
+        validations: { fileTypes: ["pdf", "jpg", "png"], maxSize: 5 },
+      },
+    })
+  );
+
+  leaveFormFields.push(
+    await prisma.formField.create({
+      data: {
+        label: "leave_declaration", // Changed from "Leave Declaration"
+        description:
+          "I verify that the information provided is true and accurate",
+        fieldType: "CHECKBOX",
+        isRequired: true,
+        validations: {},
+      },
+    })
+  );
+
+  console.log(
+    `Created ${leaveFormFields.length} form fields for leave application`
+  );
+
+  // Associate fields with the second form
+  for (let i = 0; i < leaveFormFields.length; i++) {
+    await prisma.formFieldOnForm.create({
+      data: {
+        formId: secondForm.id,
+        fieldId: leaveFormFields[i].id,
+        order: i + 1,
+      },
+    });
+  }
+
+  console.log("Associated fields with leave application form");
+
   // Create submissions for the second form
   const leaveFormDraft = await prisma.formSubmission.create({
     data: {
@@ -645,6 +822,71 @@ async function main() {
       formId: secondForm.id,
       userId: adminUser.id,
       status: "APPROVED",
+    },
+  });
+
+  // Add values for leave form submissions
+  await prisma.formValue.create({
+    data: {
+      submissionId: leaveFormDraft.id,
+      fieldId: leaveFormFields[0].id, // Now "Leave Applicant Name"
+      value: "John Smith",
+    },
+  });
+
+  await prisma.formValue.create({
+    data: {
+      submissionId: leaveFormDraft.id,
+      fieldId: leaveFormFields[3].id, // Leave Type
+      value: "Copyright Research Leave",
+    },
+  });
+
+  await prisma.formValue.create({
+    data: {
+      submissionId: leaveFormApproved.id,
+      fieldId: leaveFormFields[0].id, // Now "Leave Applicant Name"
+      value: "John Smith",
+    },
+  });
+
+  await prisma.formValue.create({
+    data: {
+      submissionId: leaveFormApproved.id,
+      fieldId: leaveFormFields[3].id, // Leave Type
+      value: "Vacation",
+    },
+  });
+
+  await prisma.formValue.create({
+    data: {
+      submissionId: leaveFormApproved.id,
+      fieldId: leaveFormFields[7].id, // Now "IP Work Related"
+      value: "Yes",
+    },
+  });
+
+  await prisma.formValue.create({
+    data: {
+      submissionId: leaveFormRejected.id,
+      fieldId: leaveFormFields[0].id, // Now "Leave Applicant Name"
+      value: "John Smith",
+    },
+  });
+
+  await prisma.formValue.create({
+    data: {
+      submissionId: leaveFormRejected.id,
+      fieldId: leaveFormFields[3].id, // Leave Type
+      value: "Study Leave",
+    },
+  });
+
+  await prisma.formValue.create({
+    data: {
+      submissionId: adminLeaveFormApproved.id,
+      fieldId: leaveFormFields[0].id, // Now "Leave Applicant Name"
+      value: "Admin User",
     },
   });
 

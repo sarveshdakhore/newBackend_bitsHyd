@@ -68,7 +68,7 @@ async function main() {
       additional_info: { department: "Legal", position: "Administrator" },
       password: {
         create: {
-          password: hashPassword("admin123", adminSalt),
+          password: hashPassword("admin123", adminSalt).hash,
           salt: adminSalt,
         },
       },
@@ -87,7 +87,7 @@ async function main() {
       additional_info: { department: "Tech", position: "Test" },
       password: {
         create: {
-          password: hashPassword("12345678", sarveshSalt),
+          password: hashPassword("12345678", sarveshSalt).hash,
           salt: sarveshSalt,
         },
       },
@@ -106,7 +106,7 @@ async function main() {
       additional_info: { department: "Copyright", position: "Applicant" },
       password: {
         create: {
-          password: hashSync("user123", userSalt),
+          password: hashPassword("user123", userSalt).hash,
           salt: userSalt,
         },
       },

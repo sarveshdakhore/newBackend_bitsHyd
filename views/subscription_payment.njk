@@ -1,0 +1,30 @@
+{% extends "layout.njk" %}
+
+{% block title %}Complete Subscription Payment{% endblock %}
+
+{% block content %}
+<h2>Complete Your Subscription</h2>
+<!-- You can customize the subscription checkout process as per Razorpay's documentation -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+  // Example subscription options – adjust as needed
+  const options = {
+    "key": "{{ keyId }}",
+    "subscription_id": "{{ subscription.id }}",
+    "name": "Crowd Funding",
+    "description": "Monthly Subscription Donation",
+    "handler": function (response){
+      alert('Subscription Activated! Payment ID: ' + response.razorpay_payment_id);
+    },
+    "theme": {
+      "color": "#006400"
+    }
+  };
+
+  // Trigger the Razorpay checkout automatically or via a button
+  window.onload = () => {
+    const rzp = new Razorpay(options);
+    rzp.open();
+  }
+</script>
+{% endblock %}

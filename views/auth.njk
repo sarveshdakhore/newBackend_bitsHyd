@@ -1,0 +1,81 @@
+{% extends "layout.njk" %}
+
+{% block title %}Auth{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="/auth-styles.css">
+<style>
+  .resend-otp-button {
+    color: blue;
+    text-decoration: underline;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  .resend-otp-button:disabled {
+    color: grey;
+    cursor: not-allowed;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+  <div class="toggle-buttons">
+    <button id="login-toggle" class="active">Login</button>
+    <button id="signup-toggle">Signup</button>
+  </div>
+  <div id="login-form" class="form active">
+    <h2>Login</h2>
+    <form id="login-password-form">
+      <input type="email" id="login-email" placeholder="Email" required>
+      <input type="password" id="login-password" placeholder="Password" required>
+      <button type="submit">Login</button>
+    </form>
+    <form id="login-otp-form" style="display: none;">
+      <input type="email" id="login-otp-email" placeholder="Email" required>
+      <button type="submit" id="send-otp-button">Send OTP</button>
+    </form>
+    <div id="otp-verification" style="display: none;">
+      <input type="text" id="otp-input" placeholder="Enter OTP" required>
+      <button id="verify-otp-button">Verify OTP</button>
+      <br><a id="resend-otp-button" class="resend-otp-button" disabled>Resend OTP</a>
+      <span id="otp-timer"></span>
+      <br><br>
+    </div>
+    <div class="toggle-switch">
+      <span>Login with OTP</span>
+      <input type="checkbox" id="toggle-otp-login">
+      <label for="toggle-otp-login"></label>
+    </div>
+    <button id="forgot-password">Forgot Password?</button>
+  </div>
+  <div id="signup-form" class="form">
+    <h2>Signup</h2>
+    <form id="signup-form">
+      <input type="email" id="signup-email" placeholder="Email" required>
+      <input type="password" id="signup-password" placeholder="Password" required>
+      <input type="password" id="signup-password-confirm" placeholder="Confirm Password" required>
+      <button type="submit">Signup</button>
+    </form>
+  </div>
+  <div id="message"></div>
+</div>
+
+<!-- Forgot Password Modal -->
+<div id="forgot-password-modal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Forgot Password</h2>
+    <form id="forgot-password-form">
+      <input type="email" id="forgot-password-email" placeholder="Email" required>
+      <button type="submit">Send Reset Password Link</button>
+    </form>
+    <div id="forgot-password-message"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/auth.js"></script>
+{% endblock %}

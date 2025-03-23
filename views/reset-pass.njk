@@ -1,0 +1,59 @@
+{% extends "layout.njk" %}
+
+{% block title %}Reset Password{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="/auth-styles.css">
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+  <h2>Reset Password</h2>
+  <form id="reset-password-form">
+    <input type="password" id="new-password" placeholder="New Password" required>
+    <input type="password" id="confirm-password" placeholder="Confirm Password" required>
+    <button type="submit">Reset Password</button>
+  </form>
+  <div id="reset-password-message"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const resetPasswordForm = document.getElementById('reset-password-form');
+  const resetPasswordMessage = document.getElementById('reset-password-message');
+
+  resetPasswordForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const password = document.getElementById('new-password').value;
+    const passwordC = document.getElementById('confirm-password').value;
+    const token = window.location.pathname.split('/').pop();
+
+    if (password !== passwordC) {
+      resetPasswordMessage.textContent = 'Passwords do not match.';
+      resetPasswordMessage.style.color = 'red';
+      return;
+    }
+
+    try {
+      const response = await fetch('/sign/reset_pass', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password, passwordC, token }),
+      });
+      const result = await response.json();
+      resetPasswordMessage.textContent = result.message;
+      if (response.ok) {
+        resetPasswordMessage.style.color = 'green';
+      } else {
+        resetPasswordMessage.style.color = 'red';
+      }
+    } catch (error) {
+      resetPasswordMessage.textContent = 'Error resetting password.';
+      resetPasswordMessage.style.color = 'red';
+    }
+  });
+});
+</script>
+{% endblock %}

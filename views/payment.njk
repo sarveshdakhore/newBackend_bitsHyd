@@ -1,0 +1,35 @@
+{% extends "layout.njk" %}
+
+{% block title %}Complete Payment{% endblock %}
+
+{% block content %}
+<h2>Complete Your Payment</h2>
+<form id="razorpay-form">
+  <button id="rzp-button">Pay Now</button>
+</form>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+  const options = {
+    "key": "{{ keyId }}",
+    "amount": "{{ order.amount }}",
+    "currency": "{{ order.currency }}",
+    "name": "Crowd Funding",
+    "description": "One-Time Donation",
+    "order_id": "{{ order.id }}",
+    "handler": function (response){
+      alert('Payment Successful! Payment ID: ' + response.razorpay_payment_id);
+      // Optionally, you can send this info to your server to verify the payment
+    },
+    "theme": {
+      "color": "#006400"  // dark green for the theme
+    }
+  };
+
+  document.getElementById('rzp-button').onclick = function(e){
+    e.preventDefault();
+    const rzp1 = new Razorpay(options);
+    rzp1.open();
+  }
+</script>
+{% endblock %}

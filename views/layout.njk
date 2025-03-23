@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}Crowd Funding{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-left-color: #388e3c; /* Dark green */
+      border-radius: 50%;
+      width: 16px;
+      height: 16px;
+      animation: spin 1s linear infinite;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 5px;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+  {% block head %}
+    
+  {% endblock %}
+</head>
+<body class="bg-gray-100">
+  <header class="bg-white shadow-md">
+    <div class="container mx-auto flex justify-between items-center p-4">
+      <a href="/" class="flex items-center space-x-2">
+        <img src="/logo.png" alt="Logo" class="h-12">
+        <h2 class="text-lg"> kiosk </h2>
+      </a>
+      <nav>
+        <ul class="flex space-x-4" id="nav-links">
+          <li id="login-signup-link"><a href="/sign/auth" class="text-gray-700 hover:text-gray-900">Login / Signup</a></li>
+          <li id="logout-link" class="hidden">
+            <a href="#" id="logout-link-anchor" class="text-gray-700 hover:text-gray-900">Logout</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+  
+  <main class="container mx-auto p-4">
+    {% block content %}{% endblock %}
+  </main>
+
+  <script src="/script.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const userCookie = getCookie('user');
+      console.log('User Cookie:', userCookie); // Log the user cookie to the console
+
+      const loginSignupLink = document.getElementById('login-signup-link');
+      const logoutLink = document.getElementById('logout-link');
+      const logoutLinkAnchor = document.getElementById('logout-link-anchor');
+
+      if (userCookie) {
+        const user = JSON.parse(userCookie);
+        // Hide login/signup link and show logout link
+        loginSignupLink.classList.add('hidden');
+        logoutLink.classList.remove('hidden');
+
+        try {
+          const response = await fetch('/sign/check_jwt', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${user.jwt}`
+            }
+          });
+
+          if (response.ok) {
+            const result = await response.json();
+            setCookie('user', JSON.stringify(result.data), 7); // Update user data in cookie
+          } else if (response.status === 401 || response.status === 400) {
+            deleteCookie('user');
+            loginSignupLink.classList.remove('hidden');
+            logoutLink.classList.add('hidden');
+          }
+        } catch (error) {
+          console.error('Error verifying JWT:', error);
+          deleteCookie('user');
+          loginSignupLink.classList.remove('hidden');
+          logoutLink.classList.add('hidden');
+        }
+      } else {
+        loginSignupLink.classList.remove('hidden');
+        logoutLink.classList.add('hidden');
+      }
+
+      logoutLinkAnchor.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const userCookie = getCookie('user');
+        if (userCookie) {
+          const user = JSON.parse(userCookie);
+          // Remove user data from cookies
+          deleteCookie('user');
+          
+          // Send POST request to backend to log out
+          try {
+            const response = await fetch('/sign/logout', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${user.jwt}`
+              },
+            });
+            if (response.ok) {
+              window.location.href = '/';
+            } else {
+              console.error('Logout failed');
+            }
+          } catch (error) {
+            console.error('Error logging out:', error);
+          }
+        }
+      });
+    });
+
+    function getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+
+    function setCookie(name, value, days) {
+      const d = new Date();
+      d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+      const expires = "expires=" + d.toUTCString();
+      document.cookie = name + "=" + value + ";" + expires + ";path=/";
+    }
+
+    function deleteCookie(name) {
+      document.cookie = name + '=; Max-Age=-99999999;';
+    }
+  </script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

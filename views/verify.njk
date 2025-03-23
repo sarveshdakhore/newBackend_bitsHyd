@@ -1,0 +1,129 @@
+{% extends "layout.njk" %}
+
+{% block title %}Verify Account{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="/auth-styles.css">
+<style>
+  .input-box[readonly] {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+    border: 1px solid #ccc;
+  }
+  .input-box[readonly]:hover,
+  .input-box[readonly]:focus {
+    border: 1px solid red;
+    outline: none;
+    background-image: linear-gradient(to right, #f5f5f5, #f5f5f5), url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICA8cGF0aCBkPSJNMTIuOTI5IDEuMDcxYTEgMSAwIDAgMC0xLjQxNCAwbC02LjQxNCA2LjQxNEExIDEgMCAwIDAgNS4wNzEgOC4wNzFsNi40MTQtNi40MTRhMSAxIDAgMCAwIDAtMS40MTR6bS0xLjQxNCAxLjQxNEw4IDcuNTg2IDMuNDg2IDMuMDg2YTEgMSAwIDAgMC0xLjQxNCAxLjQxNEw2LjU4NiA4bC02LjQxNCA2LjQxNEExIDEgMCAwIDAgMS4wNzEgMTIuOTI5bDYuNDE0LTYuNDE0YTEgMSAwIDAgMCAwLTEuNDE0eiIgZmlsbD0icmVkIi8+Cjwvc3ZnPg==');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+  }
+  .spinner {
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-left-color: #388e3c; /* Dark green */
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    animation: spin 1s linear infinite;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 5px;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+  <h2 class="text-center mb-4">Verify Your Account</h2>
+  <form id="verify-form">
+    <div class="mb-4">
+      <label for="email" class="block mb-2 text-left">Email:</label>
+      <input type="email" id="email" name="email" class="input-box" readonly>
+    </div>
+    <input type="hidden" id="token" name="token" value="">
+    <button type="submit" class="btn btn-primary">Verify</button>
+  </form>
+  <div id="verify-message" class="text-center mt-4"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const verifyForm = document.getElementById('verify-form');
+  const verifyMessage = document.getElementById('verify-message');
+  const verifyButton = verifyForm.querySelector('button');
+  const emailInput = document.getElementById('email');
+  const tokenInput = document.getElementById('token');
+
+  // Extract token and email from URL
+  const urlParts = window.location.pathname.split('/');
+  const email = decodeURIComponent(urlParts.pop());
+  const token = decodeURIComponent(urlParts.pop());
+  emailInput.value = email;
+  tokenInput.value = token;
+
+  verifyForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const token = tokenInput.value;
+
+    setLoading(verifyButton, true);
+
+    try {
+      const response = await fetch('/sign/reg_v', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token }),
+      });
+      const result = await response.json();
+      verifyMessage.textContent = result.message;
+      if (response.ok) {
+        verifyMessage.style.color = 'green';
+        verifyMessage.style.fontWeight = 'bold';
+        verifyMessage.textContent = 'Account verified. Redirecting to login page...';
+        
+        // Set user data in cookie
+        setCookie('user', JSON.stringify(result.data), 7); // Set user data in cookie for 7 days
+
+        setTimeout(() => {
+          window.location.href = '/sign/auth';
+        }, 2000); // Redirect to home page after 2 seconds
+      } else {
+        verifyMessage.style.color = 'red';
+      }
+    } catch (error) {
+      verifyMessage.textContent = 'Error verifying account.';
+      verifyMessage.style.color = 'red';
+    } finally {
+      setLoading(verifyButton, false);
+    }
+  });
+
+  function setLoading(button, isLoading) {
+    if (isLoading) {
+      button.disabled = true;
+      button.innerHTML = '<div class="spinner"></div> Loading...';
+    } else {
+      button.disabled = false;
+      button.innerHTML = 'Verify';
+    }
+  }
+
+  function setCookie(name, value, days) {
+    const d = new Date();
+    d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+    const expires = "expires=" + d.toUTCString();
+    document.cookie = name + "=" + value + ";" + expires + ";path=/";
+  }
+});
+</script>
+{% endblock %}

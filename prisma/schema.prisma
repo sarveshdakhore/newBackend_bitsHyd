@@ -1,0 +1,148 @@
+// This is your Prisma schema file
+// Learn more about it at https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+  extensions = [pgvector(map: "vector", schema: "extensions")]
+}
+
+model User {
+  id             Int           @id @default(autoincrement())
+  email          String        @unique
+  name           String?
+  verified       Boolean       @default(false)
+  password       Password?
+  otp            Otp[]
+  token_v        Int           @default(0)
+  additional_info Json?        @db.JsonB
+  roleId         Int?
+  role           Role?         @relation(fields: [roleId], references: [id])
+  formSubmissions FormSubmission[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@map("users")
+}
+
+model Password {
+  userId   Int    @unique
+  password String
+  salt     String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Otp {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  otp        String
+  expiresAt  DateTime
+  type       String   @default("login")
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  salt       String
+}
+
+model Role {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?
+  users       User[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("roles")
+}
+
+model FormField {
+  id          Int       @id @default(autoincrement())
+  label       String    @unique
+  description String?
+  fieldType   FieldType @default(TEXT)
+  isRequired  Boolean   @default(false)
+  validations Json?     @db.JsonB
+  forms       FormFieldOnForm[]
+  formValues  FormValue[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("formfields")
+}
+
+model Form {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String?
+  fields      FormFieldOnForm[]
+  submissions FormSubmission[]
+  embeddings  Unsupported("vector(1024)")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("forms")
+}
+
+model FormFieldOnForm {
+  id          Int       @id @default(autoincrement())
+  formId      Int
+  fieldId     Int
+  order       Int       @default(0)
+  form        Form      @relation(fields: [formId], references: [id])
+  formField   FormField @relation(fields: [fieldId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([formId, fieldId])
+  @@map("form_field_on_form")
+}
+
+model FormSubmission {
+  id        Int         @id @default(autoincrement())
+  formId    Int
+  userId    Int
+  form      Form        @relation(fields: [formId], references: [id])
+  user      User        @relation(fields: [userId], references: [id])
+  values    FormValue[]
+  status    SubmissionStatus @default(DRAFT)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@map("form_submissions")
+}
+
+model FormValue {
+  id             Int            @id @default(autoincrement())
+  submissionId   Int
+  fieldId        Int
+  value          String
+  submission     FormSubmission @relation(fields: [submissionId], references: [id])
+  field          FormField      @relation(fields: [fieldId], references: [id])
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@unique([submissionId, fieldId])
+  @@map("form_values")
+}
+
+enum FieldType {
+  TEXT
+  NUMBER
+  EMAIL
+  DATE
+  CHECKBOX
+  SELECT
+  MULTISELECT
+  FILE
+  TEXTAREA
+}
+
+enum SubmissionStatus {
+  DRAFT
+  SUBMITTED
+  APPROVED
+  REJECTED
+}

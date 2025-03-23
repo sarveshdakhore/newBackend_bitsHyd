@@ -1,5 +1,5 @@
 import express from 'express';
-import { updateUserAttributes, getUserAttributes, removeUserAttributes, getFormDataForML, getFormSubmissions } from '../controllers/ml/data.js';
+import { updateUserAttributes, getUserAttributes, removeUserAttributes, getFormDataForML, getFormSubmissions, getAllFormFields } from '../controllers/ml/data.js';
 import { authMiddleware } from '../middleware/auth.js';
 const router = express.Router();
 
@@ -9,6 +9,7 @@ router.get('/users/:userId/attributes', getUserAttributes);
 router.delete('/users/:userId/attributes', removeUserAttributes);
 router.get('/:formId/form-data', getFormDataForML);
 router.get('/:formId/submissions', getFormSubmissions);
+router.get("/form-fields", authMiddleware, getAllFormFields);
 
 
 export default router;

@@ -4,6 +4,6 @@ import { authMiddleware } from "../middleware/auth.js";
 
 const router = express.Router();
 
-router.get("/metrics", authMiddleware, getUserFormMetrics);
+router.get("/metrics", getUserFormMetrics);
 
 export default router;

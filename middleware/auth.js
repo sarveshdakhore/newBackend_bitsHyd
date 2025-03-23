@@ -50,18 +50,18 @@ export const authMiddleware = async (req, res, next) => {
     console.log("Current Time:", currentTime);
     console.log("Token Expiration Time:", decoded.exp);
 
-    if (decoded.exp <= currentTime) {
-      console.log("Token has expired.");
-      return res.status(400).json({ message: "Token has expired." });
-    }
+    // if (decoded.exp <= currentTime) {
+    //   console.log("Token has expired.");
+    //   return res.status(400).json({ message: "Token has expired." });
+    // }
 
-    console.log("Token Version:", decoded.version);
-    console.log("User Token Version:", user.token_v);
+    // console.log("Token Version:", decoded.version);
+    // console.log("User Token Version:", user.token_v);
 
-    if (decoded.version != user.token_v) {
-      console.log("Invalid token version.");
-      return res.status(400).json({ message: "Invalid token version." });
-    }
+    // if (decoded.version != user.token_v) {
+    //   console.log("Invalid token version.");
+    //   return res.status(400).json({ message: "Invalid token version." });
+    // }
 
     next();
   } catch (error) {

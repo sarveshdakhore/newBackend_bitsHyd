@@ -141,7 +141,7 @@ form button:hover {
 }
 
 .toggle-switch label::after {
-  content: '';
+  content: "";
   position: absolute;
   width: 16px;
   height: 16px;
@@ -213,4 +213,3 @@ form button {
   text-decoration: none;
   cursor: pointer;
 }
-

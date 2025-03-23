@@ -1,4 +1,4 @@
-import prisma from '../DB/dbConfig.js';
+import prisma from "../DB/dbConfig.js";
 
 const deleteExpiredOtps = async () => {
   const now = new Date();

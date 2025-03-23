@@ -1,6 +1,6 @@
-export const hero_home = (req,res)=>{
-  res.send('hero home Page');
-}
+export const hero_home = (req, res) => {
+  res.send("hero home Page");
+};
 
 export const data = (req, res) => {
   res.send(`
@@ -17,4 +17,4 @@ export const data = (req, res) => {
     </body>
     </html>
   `);
-}
+};

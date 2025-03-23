@@ -1,5 +1,5 @@
 // utils/buffer.js
-import prisma from '../DB/dbConfig.js';
+import prisma from "../DB/dbConfig.js";
 
 export const insertChangeToBuffer = async (userId, storeId, change) => {
   await prisma.buffer.create({

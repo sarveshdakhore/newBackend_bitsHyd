@@ -20,7 +20,8 @@
   background-color: #e6e6e6;
 }
 @media (max-width: 768px) {
-  .left, .right {
+  .left,
+  .right {
     flex: 0 0 100%;
     max-width: 100%;
     order: 0;

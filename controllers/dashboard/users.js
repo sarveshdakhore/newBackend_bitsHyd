@@ -1,4 +1,4 @@
-import prisma from "../DB/dbConfig.js";
+import prisma from "../../DB/dbConfig.js";
 
 export const getUserProfile = async (req, res) => {
   try {
@@ -47,3 +47,6 @@ export const getCurrentUserProfile = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+//sample curl
+

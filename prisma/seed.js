@@ -1,28 +1,26 @@
 import prisma from "../DB/dbConfig.js";
 import { genSaltSync, hashSync } from "bcrypt";
-import cohere from "cohere-ai";
 import dotenv from "dotenv";
+import { CohereClient } from "cohere-ai";
+import { hashPassword } from "../utils/hashing.js";
 
 dotenv.config();
 
-function generateEmbeddings() {
-  return Array(1024)
-    .fill(0)
-    .map(() => Math.random() * 2 - 1);
-}
+const cohere = new CohereClient({
+  token: process.env.COHERE_API_KEY,
+});
 
-//cohere.init(process.env.COHERE_API_KEY); // Initialize with your API key
-// Custom function to generate embeddings using Cohere API via cohere-ai library
 async function generateEmbeddingsT(text) {
   try {
     const response = await cohere.embed({
       texts: [text],
-      model: "embed-english-light-v2.0", // Change model if needed
-      truncate: "NONE",
+      model: "embed-english-v3.0",
+      inputType: "search_document", // Valid input_type
+      embeddingTypes: ["float"], // Required parameter
+      truncate: "END",
     });
 
-    // The library returns embeddings in response.body.embeddings as an array; we take the first one.
-    let vector = response.body.embeddings[0];
+    let vector = response.embeddings.float[0];
 
     // Pad or truncate to match the required 1024 dimensions
     if (vector.length < 1024) {
@@ -34,7 +32,6 @@ async function generateEmbeddingsT(text) {
     return vector;
   } catch (error) {
     console.error("Error generating embeddings:", error);
-    // Return a zero vector as fallback
     return Array(1024).fill(0);
   }
 }
@@ -71,8 +68,27 @@ async function main() {
       additional_info: { department: "Legal", position: "Administrator" },
       password: {
         create: {
-          password: hashSync("admin123", adminSalt),
+          password: hashPassword("admin123", adminSalt),
           salt: adminSalt,
+        },
+      },
+    },
+  });
+
+  // Create Sarvesh
+  const sarveshSalt = genSaltSync(10);
+  const sarveshUser = await prisma.user.create({
+    data: {
+      email: "sarvesh.dakhore2023@vitstudent.ac.in",
+      name: "Sarvesh Dakhore",
+      verified: true,
+      token_v: 1,
+      roleId: userRole.id,
+      additional_info: { department: "Tech", position: "Test" },
+      password: {
+        create: {
+          password: hashPassword("12345678", sarveshSalt),
+          salt: sarveshSalt,
         },
       },
     },
@@ -335,7 +351,7 @@ async function main() {
   `;
 
   // Generate embeddings for the form
-  const embeddingVector = await generateEmbeddings(
+  const embeddingVector = await generateEmbeddingsT(
     `${formTitle} ${formDescription}`
   );
 
@@ -597,7 +613,7 @@ async function main() {
     "Form for applying for leave from work or school";
 
   // Generate embeddings for the second form
-  const secondEmbeddingVector = await generateEmbeddings(
+  const secondEmbeddingVector = await generateEmbeddingsT(
     `${secondFormTitle} ${secondFormDescription}`
   );
 

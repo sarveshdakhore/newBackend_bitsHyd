@@ -39,28 +39,34 @@ async function generateEmbeddingsT(text) {
 async function main() {
   console.log("Starting seed process...");
 
+
+
+
   // Create roles
   const adminRole = await prisma.role.create({
     data: {
       name: "Admin",
-      description: "Administrator with full access",
+      description: "Administrator role",
     },
   });
 
   const userRole = await prisma.role.create({
     data: {
       name: "User",
-      description: "Regular user with limited access",
+      description: "Regular user role",
     },
   });
+
 
   console.log("Created roles");
 
   // Create admin user with password
-  const adminSalt = genSaltSync(10);
+  // Create admin user with password
+  let adminCredentials = hashPassword("admin123");
+    
   const adminUser = await prisma.user.create({
     data: {
-      email: "admin@example.com",
+      email: "dmtosarvesh@gmail.com",
       name: "Admin User",
       verified: true,
       token_v: 1,
@@ -68,15 +74,15 @@ async function main() {
       additional_info: { department: "Legal", position: "Administrator" },
       password: {
         create: {
-          password: hashPassword("admin123", adminSalt).hash,
-          salt: adminSalt,
+          password: adminCredentials.hash,
+          salt: adminCredentials.salt,
         },
       },
     },
   });
-
+  
   // Create Sarvesh
-  const sarveshSalt = genSaltSync(10);
+  let sarveshCredentials = hashPassword("12345678");
   const sarveshUser = await prisma.user.create({
     data: {
       email: "sarvesh.dakhore2023@vitstudent.ac.in",
@@ -87,15 +93,15 @@ async function main() {
       additional_info: { department: "Tech", position: "Test" },
       password: {
         create: {
-          password: hashPassword("12345678", sarveshSalt).hash,
-          salt: sarveshSalt,
+          password: sarveshCredentials.hash,
+          salt: sarveshCredentials.salt,
         },
       },
     },
   });
-
+  
   // Create regular user with password
-  const userSalt = genSaltSync(10);
+  let userCredentials = hashPassword("user123");
   const regularUser = await prisma.user.create({
     data: {
       email: "user@example.com",
@@ -106,29 +112,26 @@ async function main() {
       additional_info: { department: "Copyright", position: "Applicant" },
       password: {
         create: {
-          password: hashPassword("user123", userSalt).hash,
-          salt: userSalt,
+          password: userCredentials.hash,
+          salt: userCredentials.salt,
         },
       },
     },
   });
-
+  
   console.log("Created users");
-
+  
   // Create OTP for regular user (as an example)
-  const otpSalt = genSaltSync(10);
+  let otpCredentials = hashPassword("123456");
   await prisma.otp.create({
     data: {
       userId: regularUser.id,
-      otp: hashSync("123456", otpSalt),
+      otp: otpCredentials.hash,
       expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours from now
       type: "login",
-      salt: otpSalt,
+      salt: otpCredentials.salt,
     },
   });
-
-  console.log("Created OTP");
-
   // Create form fields for copyright registration form
   const formFields = [];
 
@@ -617,7 +620,7 @@ async function main() {
     `${secondFormTitle} ${secondFormDescription}`
   );
 
-  // Using raw SQL to insert the second form with vector
+  //Using raw SQL to insert the second form with vector
   await prisma.$executeRaw`
     INSERT INTO forms (title, description, embeddings, "createdAt", "updatedAt")
     VALUES (${secondFormTitle}, ${secondFormDescription}, ${secondEmbeddingVector}::vector(1024), NOW(), NOW())

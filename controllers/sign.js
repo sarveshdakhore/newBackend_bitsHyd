@@ -51,17 +51,15 @@ export const check_jwt = async (req, res) => {
   const newJwt = createToken(payload, EXP_TIME_JWT, SECRET_KEY);
   console.log("New JWT:", newJwt);
 
-  res
-    .status(200)
-    .json({
-      message: "JWT verified.",
-      data: {
-        name: user.name,
-        email: user.email,
-        password: password,
-        jwt: newJwt,
-      },
-    });
+  res.status(200).json({
+    message: "JWT verified.",
+    data: {
+      name: user.name,
+      email: user.email,
+      password: password,
+      jwt: newJwt,
+    },
+  });
 };
 
 // Login
@@ -157,12 +155,10 @@ export const hero_login = async (req, res) => {
     };
     const jwt = createToken(payload, EXP_TIME_JWT, SECRET_KEY);
 
-    res
-      .status(200)
-      .json({
-        message: "Login successful.",
-        data: { name: user.name, email: email, jwt: jwt, password: true },
-      });
+    res.status(200).json({
+      message: "Login successful.",
+      data: { name: user.name, email: email, jwt: jwt, password: true },
+    });
   }
 };
 
@@ -233,12 +229,10 @@ export const login_otp_verify = async (req, res) => {
   if (passwordData) {
     password = true;
   }
-  res
-    .status(200)
-    .json({
-      message: "OTP verified.",
-      data: { name: user.name, email: email, jwt: jwt, password: password },
-    });
+  res.status(200).json({
+    message: "OTP verified.",
+    data: { name: user.name, email: email, jwt: jwt, password: password },
+  });
 };
 
 // Forget password
@@ -515,12 +509,10 @@ export const reg_verify = async (req, res) => {
       }
       let name = cc.name;
       const jwt = createToken(payload_new, EXP_TIME_JWT, SECRET_KEY);
-      res
-        .status(200)
-        .json({
-          message: "Token verified.",
-          data: { name: name, email: email, jwt: jwt, password: passwordT },
-        });
+      res.status(200).json({
+        message: "Token verified.",
+        data: { name: name, email: email, jwt: jwt, password: passwordT },
+      });
     } catch (error) {
       console.error("Error saving user to the database:", error);
       res.status(500).json({ message: "Error saving user to the database." });

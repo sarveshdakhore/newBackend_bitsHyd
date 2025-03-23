@@ -39,9 +39,6 @@ async function generateEmbeddingsT(text) {
 async function main() {
   console.log("Starting seed process...");
 
-
-
-
   // Create roles
   const adminRole = await prisma.role.create({
     data: {
@@ -57,13 +54,12 @@ async function main() {
     },
   });
 
-
   console.log("Created roles");
 
   // Create admin user with password
   // Create admin user with password
   let adminCredentials = hashPassword("admin123");
-    
+
   const adminUser = await prisma.user.create({
     data: {
       email: "dmtosarvesh@gmail.com",
@@ -80,7 +76,7 @@ async function main() {
       },
     },
   });
-  
+
   // Create Sarvesh
   let sarveshCredentials = hashPassword("12345678");
   const sarveshUser = await prisma.user.create({
@@ -99,7 +95,7 @@ async function main() {
       },
     },
   });
-  
+
   // Create regular user with password
   let userCredentials = hashPassword("user123");
   const regularUser = await prisma.user.create({
@@ -118,9 +114,9 @@ async function main() {
       },
     },
   });
-  
+
   console.log("Created users");
-  
+
   // Create OTP for regular user (as an example)
   let otpCredentials = hashPassword("123456");
   await prisma.otp.create({

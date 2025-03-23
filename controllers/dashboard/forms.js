@@ -119,7 +119,6 @@ export const getRecentFormSubmissions = async (req, res) => {
   }
 };
 
-
 export const submitFormAI = async (req, res) => {
   try {
     const { form_struct, user_id } = req.body;
@@ -130,8 +129,12 @@ export const submitFormAI = async (req, res) => {
 
     // Validate input
     if (!form_struct || !form_struct.formId) {
-      console.log("Validation failed: Form structure and Form ID are required.");
-      return res.status(400).json({ message: "Form structure and Form ID are required." });
+      console.log(
+        "Validation failed: Form structure and Form ID are required."
+      );
+      return res
+        .status(400)
+        .json({ message: "Form structure and Form ID are required." });
     }
 
     const userId = 1; // Set user ID to 1 permanently
